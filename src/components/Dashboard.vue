@@ -1,5 +1,6 @@
 <template>
   <div id="burger-table">
+    <Message :msg="msg" v-show="msg" />
     <div>
       <div id="burger-table-heading">
         <div id="order-id">#:</div>
@@ -24,7 +25,11 @@
           </ul>
         </div>
         <div>
-          <select name="status" id="status" @change="updateBurger($event, burger.id)">
+          <select
+            name="status"
+            id="status"
+            @change="updateBurger($event, burger.id)"
+          >
             <option
               v-for="s in status"
               :key="s.id"
@@ -44,6 +49,8 @@
 </template>
 
 <script>
+import Message from "./Message.vue";
+
 export default {
   name: "Dashboard",
   data() {
@@ -51,7 +58,11 @@ export default {
       burgers: null,
       burger_id: null,
       status: [],
+      msg: null,
     };
+  },
+  components: {
+    Message,
   },
   methods: {
     async getPedidos() {
@@ -77,6 +88,10 @@ export default {
 
       const res = await req.json();
 
+      this.msg = `Pedido removido com sucesso!`;
+
+      setTimeout(() => (this.msg = ""), 3000);
+
       this.getPedidos();
     },
     async updateBurger(event, id) {
@@ -87,11 +102,14 @@ export default {
       const req = await fetch(`http://localhost:3000/burgers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: dataJson
+        body: dataJson,
       });
 
       const res = await req.json();
 
+      this.msg = `O pedido ${res.id} foi atualizado para ${res.status}!`;
+
+      setTimeout(() => (this.msg = ""), 3000);
     },
   },
   mounted() {
@@ -119,18 +137,22 @@ export default {
   border-bottom: 3px solid #333;
 }
 
-#burger-table-heading div,
+#burger-table-heading div {
+  width: 16%;
+}
 .burger-table-row div {
   width: 19%;
+  margin: auto;
 }
 
 .burger-table-row {
+  display: flex;
   width: 100%;
   padding: 12px;
   border-bottom: 1px solid #ccc;
 }
 
-#burger-table-heading .order-id,
+.order-id,
 .burger-table-row .order-number {
   width: 5%;
 }
